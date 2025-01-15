@@ -1,0 +1,589 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
+:root {
+	--primary-color: #ffffff;
+	--secondary-color: #fbfbfb;
+	--outline-color: #cacadb;
+	--accent-color: #f5f6f8;
+	--neutral-color: #eaeaef;
+	--base-color: #fff;
+	--info-color: #1c252a;
+	--error-color: #e02222;
+	--success-color: #50c878;
+	--active-color: #eaeaef;
+}
+
+[data-theme='dark'] {
+	--primary-color: #1c252a;
+	--secondary-color: #293338;
+	--outline-color: #64748b;
+	--accent-color: #232c32;
+	--neutral-color: #3a4e5c;
+	--base-color: #111827;
+	--info-color: #d9dee9;
+	--error-color: #e02222;
+	--success-color: #10b981;
+	--active-color: #3a4e5c;
+}
+
+[data-theme='light'][data-theme-option='blue'] {
+	--primary-color: #ffffff;
+	--secondary-color: #fbfbfb;
+	/* --outline-color: #0096ff; */
+	--accent-color: #f5f6f8;
+	/* --neutral-color: #eaeaef; */
+	--base-color: #eff6ff;
+	--info-color: #1a202c;
+	--error-color: #e02222;
+	--success-color: #10b981;
+	--active-color: rgba(0, 149, 255, 0.244);
+}
+[data-theme='dark'][data-theme-option='blue'] {
+	--primary-color: #1c252a;
+	--secondary-color: #242d33;
+	/* --outline-color: #0096ff; */
+	--accent-color: #1f282d;
+	/* --neutral-color: #eaeaef; */
+	--base-color: #eff6ff;
+	--info-color: #eff6ff;
+	--error-color: #e02222;
+	--success-color: #10b981;
+	--active-color: rgba(0, 149, 255, 0.244);
+}
+
+[data-theme='light'][data-theme-option='mint'] {
+	--primary-color: #ffffff;
+	--secondary-color: #fbfbfb;
+	/* --outline-color: #adebb3; */
+	--accent-color: #f5f6f8;
+	/* --neutral-color: #eaeaef; */
+	--base-color: #eff6ff;
+	--info-color: #1a202c;
+	--error-color: #e02222;
+	--success-color: #10b981;
+	--active-color: rgba(78, 197, 90, 0.342);
+}
+[data-theme='dark'][data-theme-option='mint'] {
+	--primary-color: #1c252a;
+	--secondary-color: #242d33;
+	/* --outline-color: #4ec55a; */
+	--accent-color: #1f282d;
+	/* --neutral-color: #4ec55a; */
+	--base-color: #eff6ff;
+	--info-color: #eff6ff;
+	--error-color: #e02222;
+	--success-color: #10b981;
+	--active-color: rgba(78, 197, 90, 0.342);
+}
+
+[data-theme='light'][data-theme-option='grey'] {
+	--primary-color: #ffffff;
+	--secondary-color: #fbfbfb;
+	/* --outline-color: #aeaa9e; */
+	--accent-color: #f5f6f8;
+	/* --neutral-color: #eaeaef; */
+	--base-color: #eff6ff;
+	--info-color: #1a202c;
+	--error-color: #e02222;
+	--success-color: #10b981;
+	--active-color: rgba(128, 128, 128, 0.356);
+}
+[data-theme='dark'][data-theme-option='grey'] {
+	--primary-color: #1c252a;
+	--secondary-color: #242d33;
+	/* --outline-color: #aeaa9e; */
+	--accent-color: #1f282d;
+	/* --neutral-color: #818589; */
+	--base-color: #eff6ff;
+	--info-color: #eff6ff;
+	--error-color: #e02222;
+	--success-color: #10b981;
+	--active-color: rgba(128, 128, 128, 0.356);
+}
+
+[data-theme='light'][data-theme-option='teal'] {
+	--primary-color: #ffffff;
+	--secondary-color: #fbfbfb;
+	/* --outline-color: #aeb8ce; */
+	--accent-color: #f5f6f8;
+	/* --neutral-color: #eaeaef; */
+	--base-color: #f5f3ff;
+	--info-color: #1a202c;
+	--error-color: #e02222;
+	--success-color: #34d399;
+	--active-color: rgba(50, 153, 153, 0.382);
+}
+[data-theme='dark'][data-theme-option='teal'] {
+	--primary-color: #1c252a;
+	--secondary-color: #242d33;
+	/* --outline-color: #aeb8ce; */
+	--accent-color: #1f282d;
+	/* --neutral-color: #329999; */
+	--base-color: #f5f3ff;
+	--info-color: #e5e7eb;
+	--error-color: #e02222;
+	--success-color: #218d65;
+	--active-color: rgba(50, 153, 153, 0.382);
+}
+
+[data-theme='light'][data-theme-option='gold'] {
+	--primary-color: #ffffff;
+	--secondary-color: #fbfbfb;
+	/* --outline-color:#d1a908; */
+	--accent-color: #f5f6f8;
+	/* --neutral-color: #eaeaef; */
+	--base-color: #eff6ff;
+	--info-color: #1a202c;
+	--error-color: #e02222;
+	--success-color: #10b981;
+	--active-color: rgba(255, 217, 0, 0.43);
+}
+[data-theme='dark'][data-theme-option='gold'] {
+	--primary-color: #1c252a;
+	--secondary-color: #242d33;
+	/* --outline-color: #d1a908; */
+	--accent-color: #1f282d;
+	/* --neutral-color: #ffd700; */
+	--base-color: #eff6ff;
+	--info-color: #eff6ff;
+	--error-color: #e02222;
+	--success-color: #10b981;
+	--active-color: rgba(255, 217, 0, 0.359);
+}
+
+@font-face {
+	font-family: 'Lato';
+	font-style: normal;
+	font-weight: 400;
+	src: url('/fonts/Lato-Regular.ttf') format('ttf');
+}
+* {
+	font-family: 'Lato', sans-serif;
+}
+.section {
+	@apply min-h-screen bg-secondary flex items-center justify-center px-8 relative;
+}
+.card {
+	@apply w-full max-w-md lg:max-w-lg xl:max-w-md  bg-accent  rounded-md shadow-md border border-outline;
+}
+.btn {
+	@apply w-full bg-blue-500 hover:bg-blue-600 text-base font-bold py-2 rounded-md shadow transition duration-200;
+}
+.eyebtn {
+	@apply absolute right-3 top-1/2 transform -translate-y-1/2;
+}
+.googlebtn {
+	@apply w-full text-sm flex items-center justify-center space-x-2 py-2 px-3 text-info rounded-md border border-secondary bg-base  transition;
+}
+.select {
+	@apply appearance-none border bg-secondary text-info   border-outline text-xs sm:text-sm rounded-md px-4 py-1 pr-8;
+}
+.selectcode {
+	@apply appearance-none cursor-pointer border border-outline rounded-md  px-4 py-2 md:text-sm text-info  min-w-max pr-8;
+}
+.select-box {
+	@apply relative;
+}
+.sel {
+	@apply w-full h-9 appearance-none px-3 rounded border border-outline cursor-pointer outline-none text-sm;
+}
+
+.select-box::after {
+	content: '';
+	position: absolute;
+	z-index: 1;
+	width: 8px;
+	height: 8px;
+	border-right: 1px solid var(--info-color);
+	border-bottom: 1px solid var(--info-color);
+	transform: rotate(45deg);
+	right: 16px;
+	top: 50%;
+	margin-top: -7px;
+	pointer-events: none;
+}
+.sel:focus {
+	border-color: var(--outline-color);
+}
+
+.input {
+	@apply border appearance-none bg-secondary border-outline  text-info sm:text-sm rounded-md w-full px-3 py-2;
+}
+
+.mobileinput {
+	@apply border appearance-none bg-secondary border-outline  text-info  md:text-sm  rounded-md w-full px-3 py-2;
+}
+
+.inputotp {
+	@apply border  border-outline text-info sm:text-sm rounded-md w-full  py-2 text-center;
+}
+.otp-expires {
+	@apply text-info text-xs sm:text-sm text-center my-4;
+}
+.resend-otp {
+	@apply text-info text-xs sm:text-sm text-center my-4;
+}
+.label {
+	@apply block mb-2 mt-2 text-info  text-sm font-medium;
+}
+.info-label {
+	@apply block mb-2 mt-2 text-info  text-sm font-semibold;
+}
+.para {
+	@apply text-sm font-light  text-center;
+}
+.heading {
+	@apply text-xl font-bold text-info;
+}
+.logo {
+	@apply w-10 h-10 mr-2;
+}
+.anchor {
+	@apply font-medium text-info hover:underline;
+}
+.navbar {
+	@apply bg-primary border-b border-outline text-sm py-2 flex items-center justify-between px-4 h-14 sticky top-0 z-50;
+}
+
+.logo {
+	@apply w-10 h-10;
+}
+.heading {
+	@apply text-lg font-bold text-info;
+}
+.user-profile-btn {
+	@apply w-10 h-10 rounded-full bg-secondary flex items-center justify-center;
+}
+.user-profile-btn-text {
+	@apply text-gray-800;
+}
+.user-menu {
+	@apply absolute right-0 top-14  w-56 bg-secondary rounded-md border-outline shadow-lg py-1 text-info z-50;
+}
+.user-name {
+	@apply px-3 py-2 text-base  text-info  flex items-center space-x-2;
+}
+
+.initial-icon {
+	@apply w-10 h-10 rounded-full border border-outline  bg-secondary  text-info flex items-center justify-center  uppercase text-sm;
+}
+.user-menu-item {
+	@apply flex items-center w-full px-4 py-2 text-info  hover:bg-active;
+}
+.delete-my-acc {
+	@apply text-error flex items-center w-full px-4 py-2   hover:bg-active;
+}
+.user-menu-item.delete-account {
+	@apply text-error bg-transparent border-none cursor-pointer;
+}
+.user-menu-item.delete-account:hover {
+	@apply text-error;
+}
+.user-menu-divider {
+	@apply border-outline;
+}
+.menu-icon {
+	@apply mr-2 w-5 h-5;
+}
+
+.theme-menu {
+	@apply absolute right-0 top-14  w-64  sm:w-96 bg-secondary border-outline shadow-lg rounded-md p-6 z-50;
+}
+
+.theme-divider {
+	@apply my-4  border border-secondary;
+}
+
+.theme-option {
+	@apply px-8 py-3 sm:px-8 sm:py-3  sm:pl-4  text-xs sm:text-sm relative flex items-center justify-center rounded-md;
+}
+
+.theme-modes {
+	@apply flex-1 flex items-center justify-center p-2 sm:p-4 border border-gray-600 rounded-md text-xs sm:text-sm;
+}
+
+.themes-close-button {
+	@apply absolute top-2 right-2 text-info;
+}
+.user-menu-close {
+	@apply absolute top-2 right-2 text-info;
+}
+.para {
+	@apply mb-2 text-sm text-left text-info;
+}
+
+.sidebar {
+	@apply w-16 border-r border-outline sm:w-56 min-h-screen bg-secondary  text-info px-4  py-4 fixed top-14 left-0;
+}
+.sidebar-list {
+	@apply space-y-2;
+}
+.sidebar-item {
+	@apply flex  hover:bg-primary border-outline px-2 py-2 rounded-md;
+}
+.sidebar-item span {
+	@apply ml-2;
+}
+.sidebar-icon {
+	@apply w-5 h-5 mr-3;
+}
+.sidebar-text {
+	@apply hidden sm:inline  text-info;
+}
+.main-content {
+	@apply flex-1 p-4 ml-16  sm:ml-56 bg-accent;
+}
+.iconsize {
+	@apply w-5 h-5;
+}
+.history {
+	@apply bg-secondary  border border-outline text-xs px-4 py-2 md:px-1 md:py-1 lg:px-4 lg:py-2 lg:text-sm   text-info rounded-md  hover:bg-active;
+}
+.history.active {
+	@apply bg-active;
+}
+.tasks {
+	@apply justify-between sm:justify-start space-x-6 sm:space-x-2 xl:space-x-3  text-sm sm:text-base my-3 mx-2 sm:mx-8 flex flex-row text-center;
+}
+.activetasks {
+	@apply space-y-2 sm:space-y-0 sm:space-x-2 xl:space-x-3 mx-2 sm:mx-8 sm:text-base flex flex-col md:flex-row text-sm;
+}
+.usertasks {
+	@apply mx-4 sm:mx-10;
+}
+.tabs {
+	@apply w-full mx-auto  border rounded-xl;
+}
+
+.thead {
+	@apply sticky top-0 text-sm sm:text-base  sm:text-info text-info bg-secondary  table w-full table-fixed  border-t  border-l border-r border-outline;
+}
+.table-wrapper {
+	@apply rounded-lg;
+}
+.tabledata {
+	@apply text-center text-sm border border-secondary text-info;
+}
+.tbody {
+	@apply block overflow-y-auto  rounded-b-lg  border-l border-r border-outline;
+}
+.th {
+	@apply p-2 text-left bg-neutral text-xs sm:text-sm font-normal pl-4;
+}
+.td {
+	@apply p-2 text-left bg-secondary border-b  border-outline   text-xs sm:text-sm  pl-4;
+}
+.sort-icon {
+	@apply text-sm ml-5;
+}
+.pagination-controls {
+	@apply space-x-1;
+}
+.previous {
+	@apply px-4 py-2  text-xs lg:text-sm   text-info rounded-md shadow hover:bg-active bg-secondary my-2;
+}
+
+.next {
+	@apply px-4 py-2 text-xs lg:text-sm  text-info rounded-md shadow hover:bg-active bg-secondary my-2;
+}
+.chart {
+	@apply h-80  w-full relative;
+}
+.canvas {
+	@apply absolute inset-0 w-full h-full border border-outline  bg-secondary rounded-lg p-4;
+}
+
+.userinput {
+	@apply bg-gray-50 rounded-md border border-outline p-3 text-gray-500 text-sm focus:outline-none focus:ring-1 focus:ring-gray-500;
+}
+.userlabel {
+	@apply block text-base mb-1;
+}
+.error-text {
+	@apply text-red-500 text-sm mt-1;
+}
+thead,
+tbody tr {
+	@apply table w-full table-fixed;
+}
+
+.user-profile-btn {
+	@apply cursor-pointer;
+}
+
+.overlay {
+	@apply fixed inset-0 flex  items-center justify-center;
+}
+
+.modal {
+	@apply bg-secondary border border-outline rounded-md shadow-md w-full sm:w-11/12 md:max-w-md lg:max-w-lg  p-6 mx-4 sm:mx-auto;
+}
+
+.modal-title {
+	@apply text-lg sm:text-xl font-semibold text-info;
+}
+
+.modal-message {
+	@apply mt-4 text-info text-sm;
+}
+
+.modal-actions {
+	@apply mt-6 flex flex-col sm:flex-row justify-end gap-4;
+}
+
+.cancel-btn {
+	@apply py-2 px-4 rounded-md border border-outline cursor-pointer text-sm text-info;
+}
+
+.cancel-btn:hover {
+	@apply bg-secondary;
+}
+
+.confirm-btn {
+	@apply py-2 px-4 rounded-md text-info bg-error cursor-pointer transition-colors duration-200 text-sm sm:text-base;
+}
+
+.confirm-btn:hover {
+	@apply bg-error;
+}
+
+.overlay {
+	@apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.table-container {
+	@apply w-full;
+}
+
+.table-wrapper {
+	@apply overflow-x-auto;
+}
+
+.table-footer {
+	@apply flex justify-between items-center flex-wrap;
+}
+
+.page-size-selector {
+	@apply my-4 mr-4 text-xs px-2 py-1  md:mr-3 md:text-sm md:px-4    border bg-secondary text-info rounded-md
+	appearance-none w-full   border-outline;
+}
+.pages {
+	@apply hover:bg-secondary;
+}
+.pagination-controls {
+	@apply flex flex-1 justify-end items-center text-xs sm:text-sm;
+}
+
+.pagination-button {
+	@apply sm:px-2 cursor-pointer text-info;
+}
+
+.pagination-button:disabled {
+	@apply cursor-not-allowed opacity-50;
+}
+
+.current-page {
+	@apply text-info;
+}
+
+/* Careplan */
+.careplan-history {
+	@apply text-sm lg:text-lg text-info font-semibold;
+}
+
+.basic-information {
+	@apply text-sm text-info lg:text-lg font-semibold mb-4;
+}
+
+.careplan-container {
+	@apply w-full bg-accent px-6;
+}
+
+.status-card {
+	@apply bg-secondary shadow-md p-4 hover:bg-active rounded-lg border border-outline flex flex-col items-center justify-center;
+}
+
+.basic-info-card {
+	@apply bg-secondary border-outline border rounded-lg shadow-md p-6;
+}
+
+.title {
+	@apply text-sm text-info;
+}
+
+.counts {
+	@apply text-lg lg:text-xl text-info font-semibold;
+}
+
+.careplan-info-table {
+	@apply bg-accent  rounded-lg p-2 lg:p-6 flex lg:w-1/2 justify-start;
+}
+.careplan-table {
+	@apply w-full lg:w-1/2 text-sm;
+}
+
+.careplan-table-body {
+	@apply text-info text-left;
+}
+.careplan-table-row {
+	@apply border-outline border-b;
+}
+/* Careplan  ends*/
+
+.my-profile {
+	@apply w-full mx-2 sm:mx-4;
+}
+.personal-Info {
+	@apply text-sm   text-info sm:text-lg font-semibold my-2;
+}
+
+.my-settings {
+	@apply text-sm text-info  sm:text-xl font-semibold;
+}
+
+.profile-icon {
+	@apply bg-secondary  text-info w-16 h-16 rounded-full flex items-center justify-center text-xl  my-4;
+}
+
+.demogrphic-info {
+	@apply text-sm text-info sm:text-lg font-semibold;
+}
+.health-history {
+	@apply text-sm  text-info sm:text-lg font-semibold;
+}
+
+.save-changes {
+	@apply bg-active border my-4 border-outline text-xs px-4 py-2 md:px-1 md:py-1 lg:px-4 lg:py-2 lg:text-sm  text-info rounded-md shadow hover:bg-active;
+}
+.hr-line {
+	@apply border-t border-secondary my-4;
+}
+
+.not-available {
+	@apply text-center text-xs md:text-sm text-info border border-outline rounded-md p-4;
+}
+
+.txt-gr-700 {
+	@apply text-gray-700;
+}
+
+.txt-gr-900 {
+	@apply text-gray-900;
+}
+
+.camera-icon {
+	@apply -bottom-2 -right-2 md:bottom-0 md:right-0 bg-secondary text-info p-2 rounded-full cursor-pointer flex items-center justify-center border border-outline;
+}
+
+.profile-image {
+	@apply h-24 w-24 md:h-28 md:w-28 lg:h-32 lg:w-32 rounded-full object-cover;
+}
+
+.display-name {
+	@apply text-info
+}
