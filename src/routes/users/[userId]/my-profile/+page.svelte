@@ -6,14 +6,15 @@
 		isValidEmail,
 		formatBirthdate
 	} from '$lib/utils.ts/functions';
-	import Image from '$lib/components/image.svelte';
+	import ProfileImage from '$lib/components/image.svelte';
 	import Icon from '@iconify/svelte';
+	import CropModal from '$lib/components/image-cropping/image-cropping.svelte';
 
 	///////////////////////////////////////////////////////////////////////////
 
 	export let form;
 	export let data: PageServerData;
-	console.log('form------',form)
+	console.log('form------', form);
 
 	const addressObject = data.healthProfile.Patient.User.Person.Addresses;
 
@@ -64,22 +65,65 @@
 		postalCode = firstAddress.PostalCode || '';
 	}
 
-	let previewImage = null;
 	let fileInput: HTMLInputElement;
+
 	const MAX_FILE_SIZE = 1024 * 150;
+
+	let previewImage = null;
+	let showCropModal = false;
+
 	let errorMessage = {
 		Text: '',
 		Colour: 'border-b-surface-700'
 	};
 
+	const handleSave = (croppedImage) => {
+		previewImage = croppedImage;
+		showCropModal = false;
+		console.log('croppedImage', croppedImage);
+		uploadCroppedImage(croppedImage);
+	};
+
+	async function uploadCroppedImage(base64Image) {
+		const [metadata, base64Data] = base64Image.split(',');
+		const mimeType = metadata.match(/data:(.*);base64/)[1];
+		const binaryData = atob(base64Data);
+		const arrayBuffer = new Uint8Array(binaryData.length);
+
+		for (let i = 0; i < binaryData.length; i++) {
+			arrayBuffer[i] = binaryData.charCodeAt(i);
+		}
+
+		const file = new File([arrayBuffer], 'profile-image.jpeg', { type: mimeType });
+
+		const formData = new FormData();
+		formData.append('file', file);
+
+		const response = await fetch('/api/server/upload', {
+			method: 'POST',
+			body: formData
+		});
+
+		const result = await response.json();
+		if (response.ok) {
+			console.log('File uploaded successfully:', result.filePath);
+		} else {
+			console.error('File upload failed:', result.message);
+		}
+	}
+
+	function handleCancel() {
+		showCropModal = false;
+	}
+
 	const onFileSelected = async (e: Event) => {
 		const input = e.target as HTMLInputElement;
-    	const file = input.files?.[0];
+		const file = input.files?.[0];
 		const fileSize = file.size;
 		if (fileSize > MAX_FILE_SIZE) {
 			errorMessage.Text = 'File should be less than 150 KB';
 			errorMessage.Colour = 'error-text';
-			input.value = ''; 
+			input.value = '';
 			return;
 		}
 		errorMessage.Text = null;
@@ -89,7 +133,6 @@
 		};
 		reader.readAsDataURL(file);
 	};
-	
 </script>
 
 <form action="?/updateprofile" method="post" enctype="multipart/form-data">
@@ -104,15 +147,30 @@
 						<div class="relative hidden md:flex justify-center items-center">
 							{#if previewImage !== null}
 								<img src={previewImage} alt="Preview" class="profile-image" />
-								<label for="fileinput" class="absolute camera-icon" title="Update Image">
+								<button
+									class="absolute camera-icon cursor-pointer"
+									aria-label="Update Image"
+									tabindex="0"
+									on:click={() => {
+										showCropModal = true;
+									}}
+								>
 									<Icon icon="ant-design:camera-outlined" class="h-6 w-6" />
-								</label>
-								
+								</button>
 							{:else if imageUrl !== undefined}
-								<Image source={imageUrl} w="36" h="36" cls="profile-image" />
-								<label for="fileinput" class="absolute camera-icon" title="Update Image">
+								<ProfileImage source={imageUrl} w="36" h="36" cls="profile-image" />
+								<!-- svelte-ignore a11y_click_events_have_key_events -->
+								<div
+									class="absolute camera-icon cursor-pointer"
+									role="button"
+									tabindex="0"
+									aria-label="Update Image"
+									on:click={() => {
+										showCropModal = true;
+									}}
+								>
 									<Icon icon="ant-design:camera-outlined" class="h-6 w-6" />
-								</label>
+								</div>
 							{:else}
 								<label for="fileinput" class="cursor-pointer">
 									<div
@@ -121,11 +179,21 @@
 										{initials}
 									</div>
 								</label>
-								<label for="fileinput" class="absolute camera-icon" title="Update Image">
+								<!-- svelte-ignore a11y_click_events_have_key_events -->
+								<div
+									class="absolute camera-icon cursor-pointer"
+									role="button"
+									tabindex="0"
+									aria-label="Update Image"
+									on:click={() => {
+										showCropModal = true;
+									}}
+									title="Update Image"
+								>
 									<Icon icon="ant-design:camera-outlined" class="h-6 w-6" />
-								</label>
+								</div>
 							{/if}
-							<input
+							<!-- <input
 								id="fileinput"
 								type="file"
 								class="hidden"
@@ -133,15 +201,15 @@
 								name="file"
 								on:change={onFileSelected}
 								bind:this={fileInput}
-							/>
+							/> -->
 						</div>
 						{#if errorMessage && errorMessage.Text}
-						<p class={errorMessage.Colour}>{errorMessage.Text}</p>
-					{/if}
-					<div class ="flex flex-col">
-						<span class="display-name">{personObject.DisplayName || 'Unknown'}</span>
-						<span class="display-name">{phone}</span>
-					</div>
+							<p class={errorMessage.Colour}>{errorMessage.Text}</p>
+						{/if}
+						<div class="flex flex-col">
+							<span class="display-name">{personObject.DisplayName || 'Unknown'}</span>
+							<span class="display-name">{phone}</span>
+						</div>
 					</div>
 					<input type="hidden" name="imageResourceId" value={imageResourceId} />
 					{#if form?.errors?.imageResourceId}
@@ -149,6 +217,16 @@
 					{/if}
 				</div>
 			</div>
+			<!-- Crop Modal -->
+			{#if showCropModal}
+				<CropModal
+					bind:errorMessage
+					{fileInput}
+					{previewImage}
+					save={(croppedImage) => handleSave(croppedImage)}
+					cancel={() => handleCancel()}
+				/>
+			{/if}
 			<div class="col-span-3 mx-6">
 				<div class="flex md:hidden items-center">
 					<!-- <div class="profile-container flex items-center gap-4">
@@ -194,7 +272,7 @@
 									<Icon icon="ant-design:camera-outlined" class="h-6 w-6" />
 								</label>
 							{:else if imageUrl !== undefined}
-								<Image source={imageUrl} w="20" h="36" cls="profile-image" />
+								<ProfileImage source={imageUrl} w="20" h="36" cls="profile-image" />
 								<label for="fileinput" class="absolute camera-icon" title="Update Image">
 									<Icon icon="ant-design:camera-outlined" class="h-6 w-6" />
 								</label>
@@ -219,16 +297,14 @@
 								on:change={onFileSelected}
 								bind:this={fileInput}
 							/>
-						
 						</div>
 						{#if errorMessage && errorMessage.Text}
-						<p class={errorMessage.Colour}>{errorMessage.Text}</p>
+							<p class={errorMessage.Colour}>{errorMessage.Text}</p>
 						{/if}
-						<div class ="flex flex-col">
+						<div class="flex flex-col">
 							<span class="display-name">{personObject.DisplayName || 'Unknown'}</span>
 							<span class="display-name">{phone}</span>
 						</div>
-						
 					</div>
 					<input type="hidden" name="imageResourceId" value={imageResourceId} />
 					{#if form?.errors?.imageResourceId}
@@ -439,7 +515,7 @@
 					</div>
 				</div>
 
-				<div class="flex justify-end ">
+				<div class="flex justify-end">
 					<button class="save-changes" type="submit"> Save changes </button>
 				</div>
 			</div>
