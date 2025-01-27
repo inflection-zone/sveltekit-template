@@ -24,21 +24,21 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
 export const load = async () => {
-	const user = formDataArray.find((user) => user.id === 1);
+ const user = formDataArray.find((user) => user.id === 1);
 
-	if (!user) {
-		return {
-			status: 404,
-			error: new Error('User not found')
-		};
-	}
+ if (!user) {
+  return {
+   status: 404,
+   error: new Error('User not found')
+  };
+ }
 
-	if (!user) error(404, 'Not found');
+ if (!user) error(404, 'Not found');
 
-	const form = await superValidate(user, zod(schema));
+ const form = await superValidate(user, zod(schema));
 
-	// Always return { form } in load functions
-	return { form };
+ // Always return { form } in load functions
+ return { form };
 };
 ```
 
@@ -53,17 +53,17 @@ import {superForm} from 'sveltekit-superforms'; import SuperDebug from 'svelteki
 
 ```html
 <div>
-	<label for="firstName">First Name</label>
-	<input
-		name="FirstName"
-		bind:value={$form.FirstName}
-		aria-invalid={$errors.FirstName ? 'true' : undefined}
-		{...$constraints.FirstName}
-	/>
+ <label for="firstName">First Name</label>
+ <input
+  name="FirstName"
+  bind:value={$form.FirstName}
+  aria-invalid={$errors.FirstName ? 'true' : undefined}
+  {...$constraints.FirstName}
+ />
 
-	{#if $errors.FirstName}
-		<p class="mt-1 text-sm text-red-500">{$errors.FirstName}</p>
-	{/if}
+ {#if $errors.FirstName}
+  <p class="mt-1 text-sm text-red-500">{$errors.FirstName}</p>
+ {/if}
 </div>
 ```
 
@@ -71,24 +71,24 @@ import {superForm} from 'sveltekit-superforms'; import SuperDebug from 'svelteki
 
 ```js
 export const actions = {
-	create: async ({ request }) => {
-		console.log('Form submitted');
-		// The adapter must be defined before superValidate for JSON Schema.
-		const adapter = zod(schema);
-		const form = await superValidate(request, adapter);
+ create: async ({ request }) => {
+  console.log('Form submitted');
+  // The adapter must be defined before superValidate for JSON Schema.
+  const adapter = zod(schema);
+  const form = await superValidate(request, adapter);
 
-		console.log(form);
+  console.log(form);
 
-		if (!form.valid) {
-			// Again, return { form } and things will just work.
-			return fail(400, { form });
-		}
+  if (!form.valid) {
+   // Again, return { form } and things will just work.
+   return fail(400, { form });
+  }
 
-		// TODO: Do something with the validated form.data
+  // TODO: Do something with the validated form.data
 
-		// Display a success status message
-		return message(form, 'Form posted successfully!');
-	}
+  // Display a success status message
+  return message(form, 'Form posted successfully!');
+ }
 };
 ```
 
@@ -119,7 +119,7 @@ _Similar to validate, validateForm lets you validate the whole form and return a
 const result = await validateForm();
 
 if (result.valid) {
-	// ...
+ // ...
 }
 
 // You can use the update option to trigger a client-side validation
@@ -137,7 +137,7 @@ const result2 = await validateForm({ schema: zod(partialSchema) });
 
 ```js
 if (user.Email === form.data.Email) {
-	return setError(form, 'Email', 'E-mail already exists.');
+ return setError(form, 'Email', 'E-mail already exists.');
 }
 ```
 
@@ -149,11 +149,11 @@ If no data was posted or sent to superValidate, no errors will be returned unles
 
 ```js
 export const load = async () => {
-	// No errors set, since no data is sent to superValidate
-	const form = await superValidate(zod(schema));
+ // No errors set, since no data is sent to superValidate
+ const form = await superValidate(zod(schema));
 
-	// No data, but errors can still be added with an option
-	const form2 = await superValidate(zod(schema), { errors: true });
+ // No data, but errors can still be added with an option
+ const form2 = await superValidate(zod(schema), { errors: true });
 };
 ```
 
@@ -169,9 +169,9 @@ _Since validation is handled by Superforms, there is no need for spreading `$con
 
 ```js
 const { form, enhance } = superForm(data.form, {
-	customValidity: true,
-	// Not required, but will use client-side validation for real-time error display:
-	validators: schema
+ customValidity: true,
+ // Not required, but will use client-side validation for real-time error display:
+ validators: schema
 });
 ```
 
@@ -309,21 +309,21 @@ export const actions = {
 
 ```js
 const {
-	form: loginForm,
-	errors: loginForm,
-	enhance: loginForm,
-	message: loginForm
+ form: loginForm,
+ errors: loginForm,
+ enhance: loginForm,
+ message: loginForm
 } = superForm(data.loginForm, {
-	resetForm: true
+ resetForm: true
 });
 
 const {
-	form: registerForm,
-	errors: registerErrors,
-	enhance: registerEnhance,
-	message: registerMessage
+ form: registerForm,
+ errors: registerErrors,
+ enhance: registerEnhance,
+ message: registerMessage
 } = superForm(data.registerForm, {
-	resetForm: true
+ resetForm: true
 });
 ```
 
@@ -378,24 +378,24 @@ schemas
 
 ```js
 export const schema = z.object({
-	file: z
-		.instanceof(File)
-		.refine((file) => file.size <= 2 * 1024 * 1024, 'File must be less than 2MB')
-		.refine((file) => ['image/jpeg', 'image/png'].includes(file.type), 'File must be a JPEG or PNG')
+ file: z
+  .instanceof(File)
+  .refine((file) => file.size <= 2 * 1024 * 1024, 'File must be less than 2MB')
+  .refine((file) => ['image/jpeg', 'image/png'].includes(file.type), 'File must be a JPEG or PNG')
 });
 
 export const schema = z.object({
-	user: z.object({
-		name: z.string().min(1, 'Name is required'),
-		age: z.number().min(18, 'Age must be 18 or older')
-	})
+ user: z.object({
+  name: z.string().min(1, 'Name is required'),
+  age: z.number().min(18, 'Age must be 18 or older')
+ })
 });
 
 export const schema = z.object({
-	items: z
-		.array(z.string().min(1, 'Item cannot be empty'))
-		.min(1, 'At least one item is required')
-		.max(5, 'No more than 5 items allowed')
+ items: z
+  .array(z.string().min(1, 'Item cannot be empty'))
+  .min(1, 'At least one item is required')
+  .max(5, 'No more than 5 items allowed')
 });
 ```
 
@@ -403,12 +403,12 @@ form for file
 
 ```html
 <form method="post" enctype="multipart/form-data" use:enhance>
-	<label for="file">Upload a file (JPEG/PNG under 2MB):</label>
-	<input type="file" name="file" bind:value="{$form.file}" />
-	{#if $form.errors.file}
-	<p class="error">{$form.errors.file}</p>
-	{/if}
-	<button type="submit">Submit</button>
+ <label for="file">Upload a file (JPEG/PNG under 2MB):</label>
+ <input type="file" name="file" bind:value="{$form.file}" />
+ {#if $form.errors.file}
+ <p class="error">{$form.errors.file}</p>
+ {/if}
+ <button type="submit">Submit</button>
 </form>
 ```
 
@@ -416,19 +416,19 @@ form for Object
 
 ```html
 <form method="post" use:enhance>
-	<label for="name">Name:</label>
-	<input type="text" name="user.name" bind:value="{$form.user.name}" />
-	{#if $form.errors['user.name']}
-	<p class="error">{$form.errors['user.name']}</p>
-	{/if}
+ <label for="name">Name:</label>
+ <input type="text" name="user.name" bind:value="{$form.user.name}" />
+ {#if $form.errors['user.name']}
+ <p class="error">{$form.errors['user.name']}</p>
+ {/if}
 
-	<label for="age">Age:</label>
-	<input type="number" name="user.age" bind:value="{$form.user.age}" />
-	{#if $form.errors['user.age']}
-	<p class="error">{$form.errors['user.age']}</p>
-	{/if}
+ <label for="age">Age:</label>
+ <input type="number" name="user.age" bind:value="{$form.user.age}" />
+ {#if $form.errors['user.age']}
+ <p class="error">{$form.errors['user.age']}</p>
+ {/if}
 
-	<button type="submit">Submit</button>
+ <button type="submit">Submit</button>
 </form>
 ```
 
@@ -436,16 +436,16 @@ form for Array
 
 ```html
 <form method="post" use:enhance>
-	<label for="items">Add Items:</label>
-	{#each $form.items as item, index}
-	<div>
-		<input type="text" name="items[]" bind:value="{$form.items[index]}" />
-	</div>
-	{/each} {#if $form.errors.items}
-	<p class="error">{$form.errors.items}</p>
-	{/if}
+ <label for="items">Add Items:</label>
+ {#each $form.items as item, index}
+ <div>
+  <input type="text" name="items[]" bind:value="{$form.items[index]}" />
+ </div>
+ {/each} {#if $form.errors.items}
+ <p class="error">{$form.errors.items}</p>
+ {/if}
 
-	<button type="button" on:click="{()" ="">$form.items.push('')}>Add Item</button>
-	<button type="submit">Submit</button>
+ <button type="button" on:click="{()" ="">$form.items.push('')}>Add Item</button>
+ <button type="submit">Submit</button>
 </form>
 ```
