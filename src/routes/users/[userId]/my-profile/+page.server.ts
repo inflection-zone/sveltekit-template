@@ -2,11 +2,12 @@ import { error, type RequestEvent } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { z } from 'zod';
 import { zfd } from 'zod-form-data';
-import * as fs from 'fs';
+import { upload } from '$routes/api/services/file.resource';
+import fs from "fs/promises";
+import path from "path";
 import { redirect } from 'sveltekit-flash-message/server';
 import { errorMessage, successMessage } from '$lib/utils.ts/message.utils';
 import { getPatientById, updatePatientById } from '$routes/api/services/user';
-import { upload} from '$routes/api/services/file.resource';
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -67,7 +68,7 @@ export const actions = {
 		const data = await request.formData();
 		const formData = Object.fromEntries(data);
 		const file = data.get('file') as File;
-        console.log('file', file);
+		console.log('file', file);
 
 		type updateProfileSchema = z.infer<typeof updateUserProfile>;
 		let result: updateProfileSchema = {};
@@ -86,22 +87,33 @@ export const actions = {
 
 		let imageResourceId: string | null = result.imageResourceId;
 
-		if (file && file.size > 0){
-			const filename = file.name;
-			const fileBuffer = Buffer.from(await file.arrayBuffer());
-			console.log('File buffer length:', fileBuffer.length);
-			const filePath = `/tmp/${filename}`;
-			fs.writeFileSync(filePath, fileBuffer);
-			const uploadResponse = await upload(sessionId, filePath, filename, true);
-			console.log('Upload response:', JSON.stringify(uploadResponse, null, 2));
-			if (uploadResponse.Status === 'success') {
-				imageResourceId = uploadResponse.Data.FileResources[0]?.id || null;
-				console.log('Image resource ID:', imageResourceId);
+		const tempDir = path.resolve("temp");
+		try {
+
+			const files = await fs.readdir(tempDir);
+
+			if (files.length === 0) {
+				throw new Error("No files found in temp folder.");
 			}
+
+			const tempFileName = files[0];
+			const filePath = path.join(tempDir, tempFileName);
+
+			const uploadResponse = await upload(sessionId, filePath, tempFileName, true);
+			console.log("Upload response:", JSON.stringify(uploadResponse, null, 2));
+
+			if (uploadResponse.Status === "success") {
+				imageResourceId = uploadResponse.Data.FileResources[0]?.id || null;
+				console.log("Image resource ID:", imageResourceId);
+			}
+
+			await fs.unlink(filePath);
+		} catch (error) {
+			console.error("Error accessing or uploading the file:", error);
 		}
 
 		// const phone = result.countryCode + '-' + result.phone;
-		
+
 		const response = await updatePatientById(
 			sessionId,
 			userId,
@@ -129,12 +141,12 @@ export const actions = {
 		if (response.Status == 'failure' || response.HttpCode !== 200) {
 			throw redirect(`/users/${userId}/my-profile`, errorMessage(response.Message), event);
 		}
-		
+
 		throw redirect(
-            303,
-            `/users/${userId}/my-profile`,
-            successMessage(`Profile updated successfully!`),
-            event
-        );
+			303,
+			`/users/${userId}/my-profile`,
+			successMessage(`Profile updated successfully!`),
+			event
+		);
 	}
 };
