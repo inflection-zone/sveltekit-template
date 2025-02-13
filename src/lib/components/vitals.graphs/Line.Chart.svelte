@@ -2,8 +2,8 @@
 	import { onMount, onDestroy } from 'svelte';
 	import Chart from 'chart.js/auto';
 
-  /////////////////////////////////////////////////////////////////
-  
+	/////////////////////////////////////////////////////////////////
+
 	export let labels: string[] = [];
 	export let data: number[] = [];
 	export let title: string;
@@ -61,6 +61,9 @@
 							display: true,
 							text: 'Date',
 							color: textColor
+						},
+						border: {
+							color: gridColor // Change x-axis line color
 						}
 					},
 					y: {
@@ -79,6 +82,9 @@
 							display: true,
 							text: title,
 							color: textColor
+						},
+						border: {
+							color: gridColor // Change y-axis line color
 						}
 					}
 				},
