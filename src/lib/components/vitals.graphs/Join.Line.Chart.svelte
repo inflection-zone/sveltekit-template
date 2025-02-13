@@ -77,6 +77,9 @@
 							display: true,
 							text: 'Date',
 							color: textColor
+						},
+						border: {
+							color: gridColor // Change y-axis line color
 						}
 					},
 					y: {
@@ -93,6 +96,9 @@
 							display: true,
 							text: title,
 							color: textColor
+						},
+						border: {
+							color: gridColor // Change y-axis line color
 						}
 					}
 				},
