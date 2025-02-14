@@ -31,8 +31,8 @@ export const getPatientById = async (
 	const url = BACKEND_API_URL + `/patients/${patientId}`;
 	const cacheKey = `session-${sessionId}:req-getPatientById`;
 	if (await CacheService.has(cacheKey)) {
-        return await CacheService.get(cacheKey);
-    }
+		return await CacheService.get(cacheKey);
+	}
 	const result = await get_(url, true, sessionId);
 	await CacheService.set(cacheKey, result);
 	return result;
@@ -107,4 +107,29 @@ export const updatePatientById = async (
 	const findAndClearKeys = [`session-${sessionId}:req-getPatientById`];
 	await CacheService.findAndClear(findAndClearKeys)
 	return await put_(url, body, true, sessionId);
+};
+
+
+export const createdUser = async (
+	firstName: string,
+	lastName: string,
+	countryCode: number,
+	phone: string,
+	email: string,
+	username: string,
+	password: string
+) => {
+	const body = {
+
+		FirstName: firstName,
+		LastName: lastName,
+		CountryCode: countryCode,
+		Phone: phone,
+		Email: email,
+		Username: username,
+		Password: password
+	};
+
+	const url = BACKEND_API_URL + `/users`;
+	return await post_(url, body);
 };

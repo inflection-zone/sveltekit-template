@@ -1,20 +1,23 @@
 <script lang="ts">
-	import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
-	import { page } from '$app/state';
+	import { afterNavigate, goto } from '$app/navigation';
 	import { schema, formDataArray } from '$lib';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	// import type { PageServerData } from '../$types';
-
-	let { data } = $props();
-	// let data:PageServerData;
 	import { onMount } from 'svelte';
-	import { storeInIndexedDB, getAllFromIndexedDB, clearIndexedDB } from '$lib/utils/indexedDBUtils';
-	// import { enhance } from '$app/forms';
+	import { StorageManager } from '$lib/utils/storage';
+	import type { PrimitiveType } from '$lib/utils/storageTypes';
+
+	//////////////////////////////////////////////////////////////////////////////////
+
+	let data = $props();
+
+	const dbName = 'myFormDatabase';
+	const storeName = 'forms';
+	const formName = 'UserAccountForm';
 
 	let isOffline = false;
-	const formName = 'UserAccountForm';
-	// Monitor network status
+
+	let storage = new StorageManager('indexedDB', dbName, storeName);
 	onMount(() => {
 		isOffline = !navigator.onLine;
 		window.addEventListener('online', handleOnline);
@@ -24,59 +27,110 @@
 
 	async function handleOnline() {
 		isOffline = false;
-		await checkAndSyncData(); // Sync offline data when back online
+		await checkAndSyncData();
 	}
 
-	async function submitForm(event: Event) {
-		event.preventDefault();
-		const formElement = event.target as HTMLFormElement;
-		const formData = new FormData(formElement);
-		const data = Object.fromEntries(formData.entries());
 
-		if (isOffline) {
-			console.log('Offline. Storing data in IndexedDB.');
-			await storeInIndexedDB(formName, data);
-		} else {
-			console.log('Online. Submitting data via form action.');
-			formElement.submit(); // Submit form to the action directly
-		}
-	}
 
-	async function checkAndSyncData() {
-		const offlineData = await getAllFromIndexedDB(formName);
-		if (offlineData.length > 0) {
-			for (const data of offlineData) {
-				// Send the data to the server using fetch
-				try {
-					await fetch('/api/server/submit', {
-						method: 'POST',
-						body: JSON.stringify(data),
-						headers: { 'Content-Type': 'application/json' }
-					});
-				} catch (error) {
-					console.error('Failed to sync data:', error);
-				}
-			}
-			await clearIndexedDB(formName); // Clear synced data from IndexedDB
-		}
-	}
+async function submitForm(event: Event) {
+    event.preventDefault();
+    const formElement = event.target as HTMLFormElement;
+    const formData = new FormData(formElement);
+
+    const data: Record<string, PrimitiveType | File> = {};
+    formData.forEach((value, key) => {
+        data[key] = value as PrimitiveType | File;
+    });
+
+    // Convert CountryCode to an integer
+    if (data.CountryCode) {
+        data.CountryCode = parseInt(data.CountryCode as string, 10);
+    }
+
+    // Validate form data
+    const result = schema.safeParse({
+        FirstName: data.FirstName,
+        LastName: data.LastName,
+        CountryCode: data.CountryCode,
+        Phone: data.Phone,
+        Email: data.Email,
+        Username: data.Username,
+        Password: data.Password,
+    });
+
+    if (!result.success) {
+        // Handle validation errors
+        console.error('Validation errors:', result.error.errors);
+        result.error.errors.forEach(error => {
+            console.error(`Error in ${error.path[0]}: ${error.message}`);
+        });
+        return;
+    }
+
+    // Format the current date to "07 February 2025"
+    const formatDate = (date: Date) => {
+        const options: Intl.DateTimeFormatOptions = {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+        };
+        return date.toLocaleDateString('en-US', options);
+    };
+
+    const currentDate = new Date();
+    const formattedDate = formatDate(currentDate);
+
+    console.log('Form Data:', data);
+    if (isOffline) {
+        console.log('Offline. Storing data in IndexedDB.');
+        const storeObject = {
+            id: formName,
+            name: formName,
+            data: data,
+            createdAt: formattedDate,
+            updatedAt: formattedDate,
+            metadata: {}
+        };
+        await storage.set(formName, storeObject);
+    } else {
+        console.log('Online. Submitting data via form action.');
+        // formElement.submit();
+    }
+}
+
+async function checkAndSyncData() {
+    const offlineData = await storage.get(formName);
+    console.log('Offline Data:', offlineData);
+    if (offlineData) {
+        try {
+            await fetch('/api/server/submit', {
+                method: 'POST',
+                body: JSON.stringify(offlineData.data),
+                headers: { 'Content-Type': 'application/json' }
+            });
+        } catch (error) {
+            console.error('Failed to sync data:', error);
+        }
+        await storage.remove(formName);
+    }
+}
+
+
 
 	let originalData = {
-		FirstName: data.form.data.FirstName,
-		LastName: data.form.data.LastName,
-		CountryCode: data.form.data.CountryCode,
-		Phone: data.form.data.Phone,
-		Email: data.form.data.Email,
-		Username: data.form.data.Username,
-		Password: data.form.data.Password
+		FirstName: data.data.form.data.FirstName,
+		LastName: data.data.form.data.LastName,
+		CountryCode: data.data.form.data.CountryCode,
+		Phone: data.data.form.data.Phone,
+		Email: data.data.form.data.Email,
+		Username: data.data.form.data.Username,
+		Password: data.data.form.data.Password
 	};
 
 	const { form, enhance, constraints, validate, validateForm, message, errors } = superForm(
-		data.form,
+		data.data.form,
 		{
-			//   validators: ClientValidationAdapter<S> | 'clear' | false,
 			validationMethod: 'oninput',
-			//   customValidity: boolean = false
 			validators: zodClient(schema),
 			errorSelector: '[aria-invalid="true"],[data-invalid]',
 			scrollToError: 'smooth',
@@ -86,74 +140,33 @@
 		}
 	);
 
-	// Function to reset form to its original values
+
 	function resetForm() {
-		form.set({ ...originalData }); // Clone original data into the form
+		form.set({ ...originalData }); 
 	}
 
 	const init = () => {
-		const userId = page.params.userId;
-		console.log('userId', userId);
-
-		originalData.FirstName = data.form.data.FirstName;
-		originalData.LastName = data.form.data.LastName;
-		originalData.CountryCode = data.form.data.CountryCode;
-		originalData.Phone = data.form.data.Phone;
-		originalData.Email = data.form.data.Email;
-		originalData.Username = data.form.data.Username;
-		originalData.Password = data.form.data.Password;
+		originalData.FirstName = data.data.form.data.FirstName;
+		originalData.LastName = data.data.form.data.LastName;
+		originalData.CountryCode = data.data.form.data.CountryCode;
+		originalData.Phone = data.data.form.data.Phone;
+		originalData.Email = data.data.form.data.Email;
+		originalData.Username = data.data.form.data.Username;
+		originalData.Password = data.data.form.data.Password;
 	};
 
 	afterNavigate(() => {
 		init();
 	});
 
-	// Function to populate form with user data
+
 	function loadUserData(user: any) {
-		goto(`/user/create/${user.id}`);
+		goto(`/add-features/service-worker/${user.id}`);
 	}
 
-	// beforeNavigate(({ cancel }) => {
-	// 	if (dirty) {
-	// 		if (
-	// 			!confirm(
-	// 				'Are you sure you want to leave this page? You have unsaved changes that will be lost.'
-	// 			)
-	// 		) {
-	// 			cancel();
-	// 		}
-	// 	}
-	// });
-	let isFormDirty = false;
-
-	function handleInputChange() {
-		isFormDirty = true;
-	}
-
-	// Add event listener to warn user about unsaved changes
-	onMount(() => {
-		// Add event listener to warn user about unsaved changes
-		window.addEventListener('beforeunload', (event) => {
-			if (isFormDirty) {
-				event.preventDefault();
-				event.returnValue = '';
-			}
-		});
-
-		// Clean up the event listener when component is destroyed
-		return () => {
-			window.removeEventListener('beforeunload', (event) => {
-				if (isFormDirty) {
-					event.preventDefault();
-					event.returnValue = '';
-				}
-			});
-		};
-	});
 </script>
 
-
-	<a href="/worker" class="text-blue-600 underline" >Go to worker</a>
+<a href="/worker" class="text-blue-600 underline">Go to worker</a>
 
 <div class="flex">
 	<div class="w-1/6 bg-gray-100 p-4">
@@ -183,7 +196,6 @@
 			use:enhance
 			action="?/create"
 			onsubmit={submitForm}
-			
 		>
 			<div>
 				<label for="FirstName" class="block text-sm font-medium text-gray-700">First Name</label>
@@ -195,7 +207,6 @@
 					bind:value={$form.FirstName}
 					aria-invalid={$errors.FirstName ? 'true' : undefined}
 					{...$constraints.FirstName}
-					
 				/>
 
 				{#if $errors.FirstName}
@@ -223,7 +234,7 @@
 				<label for="CountryCode" class="block text-sm font-medium text-gray-700">Country Code</label
 				>
 				<input
-					type="text"
+					type="number"
 					placeholder="Enter country code"
 					class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
 					name="CountryCode"
@@ -240,7 +251,7 @@
 				<label for="Phone" class="block text-sm font-medium text-gray-700">Phone</label>
 				<input
 					name="Phone"
-					type="number"
+					type="text"
 					placeholder="Enter phone number"
 					class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
 					bind:value={$form.Phone}

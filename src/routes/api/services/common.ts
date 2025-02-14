@@ -29,11 +29,11 @@ export const post_ = async (
 			if (res.status === 500) {
 				throw error(500, { message: res.statusText });
 			} else {
-				console.log(chalk.red(`post_ response message: ${message}`));
+				console.log(chalk.red(`post_ response message1: ${message}`));
 				return response;
 			}
 		}
-		console.log(chalk.green(`post_ response message: ${message}`));
+		console.log(chalk.green(`post_ response message2: ${message}`));
 		return response;
 	} catch (err) {
 		console.log(chalk.red(`post_ exception: ${err}`));
